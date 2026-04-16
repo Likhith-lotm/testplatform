@@ -750,7 +750,7 @@ def make_app():
 
 if __name__ == "__main__":
     app = make_app()
-    fs = AsyncIOMotorGridFSBucket(db)
+    fs = motor.motor_asyncio.AsyncIOMotorGridFSBucket(db)
     app.listen(9999)
     print("Server running on http://localhost:9999")
     tornado.ioloop.IOLoop.current().start()
