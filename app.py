@@ -21,8 +21,6 @@ db = client["testdb"]
 users_collection = db["users"]
 questions_collection = db["questions"]
 
-from motor.motor_asyncio import AsyncIOMotorGridFSBucket
-fs = AsyncIOMotorGridFSBucket(db)
 
 # Base Handler (Handles CORS & Authentication Check)
 class BaseHandler(tornado.web.RequestHandler):
@@ -497,14 +495,12 @@ import tornado.web
 import json
 
 
-from motor.motor_asyncio import AsyncIOMotorGridFSBucket
-fs = AsyncIOMotorGridFSBucket(db)
+
 
 db = client["testdb"]
 users_collection = db["users"]
 
-from motor.motor_asyncio import AsyncIOMotorGridFSBucket
-fs = AsyncIOMotorGridFSBucket(db)
+
 
 
 import json
@@ -754,6 +750,7 @@ def make_app():
 
 if __name__ == "__main__":
     app = make_app()
+    fs = AsyncIOMotorGridFSBucket(db)
     app.listen(9999)
     print("Server running on http://localhost:9999")
     tornado.ioloop.IOLoop.current().start()
