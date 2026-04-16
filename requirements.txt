@@ -1,0 +1,13 @@
+tornado
+pymongo
+dnspython
+bcrypt
+pydantic
+fastapi
+uvicorn
+python-multipart
+httpx
+motor
+werkzeug
+
+

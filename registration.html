@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Register</title>
+
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+		body {
+  font-family: 'Inter', sans-serif;
+  background-image: url('ORSJP90.jpg');     /* ✅ Your background image */
+  background-size: cover;                  /* ✅ Cover the entire screen */
+  background-position: center;             /* ✅ Center the image */
+  background-repeat: no-repeat;            /* ✅ No repeat */
+  color: #f5f5f5;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+      	header {
+			background-color: transparent;
+			text-align: center;
+			color: #f4a940;
+			margin-top: 30px;
+		}
+
+		.container {
+			
+  background-color: rgba(0, 0, 0, 0.4);  /* ✅ semi-transparent dark background */
+  backdrop-filter: blur(10px);          /* ✅ frosted glass effect */
+  -webkit-backdrop-filter: blur(10px);  /* ✅ Safari support */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 30px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  margin-bottom: 40px;
+
+
+		}
+
+		label {
+			margin-top: 10px;
+			font-size: 14px;
+			color: #ccc;
+		}
+
+		.form-control {
+			background: #1e1e1e;
+			color: #fff;
+			border: 1px solid #333;
+			padding: 12px;
+			border-radius: 10px;
+			width: 100%;
+			margin-top: 5px;
+			margin-bottom: 15px;
+		}
+
+		.btn {
+			background-color: #f4a940;
+			border: none;
+			color: #000;
+			padding: 12px;
+			width: 100%;
+			border-radius: 10px;
+			font-weight: 600;
+			transition: all 0.3s ease;
+		}
+
+		.btn:hover {
+			background-color: #ffbb54;
+			transform: scale(1.02);
+		}
+
+		footer {
+			text-align: center;
+			padding: 15px;
+			background-color: #121212;
+			color: #aaa;
+			font-size: 14px;
+			position: fixed;
+			bottom: 0;
+			width: 100%;
+			border-top: 1px solid #2a2a2a;
+		}
+	</style>
+
+	<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		const registrationForm = document.getElementById("registrationForm");
+
+		if (!registrationForm) {
+			console.error("Error: registrationForm not found. Ensure your form has id='registrationForm'.");
+			return;
+		}
+
+		function validateMobile() {
+			const mobile = document.getElementById("mobile").value.trim();
+			const mobilePattern = /^\d{10}$/;
+			if (!mobilePattern.test(mobile)) {
+				alert("Mobile number must be exactly 10 digits.");
+				return false;
+			}
+			return true;
+		}
+
+		function validateEmail(email) {
+			const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+			if (!emailPattern.test(email.trim())) {
+				alert("Please enter a valid email address.");
+				return false;
+			}
+			let parts = email.trim().split("@");
+			if (parts.length !== 2) {
+				alert("Invalid email format. Please check your email.");
+				return false;
+			}
+			let domain = parts[1].toLowerCase();
+			const allowedProviders = ["gmail.com", "yahoo.com", "outlook.com"];
+			if (!allowedProviders.includes(domain)) {
+				alert("Only Gmail, Yahoo, or Outlook email addresses are allowed.");
+				return false;
+			}
+			return true;
+		}
+
+		function validatePassword(password) {
+			return password.trim().length >= 6;
+		}
+
+		async function registerUser(event) {
+			event.preventDefault();
+
+			if (!validateMobile()) return;
+
+			let email = document.getElementById("email").value.trim();
+			if (!validateEmail(email)) {
+				alert("Please enter a valid email address.");
+				return;
+			}
+
+			let password = document.getElementById("password").value.trim();
+			if (!validatePassword(password)) {
+				alert("Password must be at least 6 characters long.");
+				return;
+			}
+
+			let formData = new FormData();
+			formData.append("username", document.getElementById("username").value.trim());
+			formData.append("email", email);
+			formData.append("mobile", document.getElementById("mobile").value.trim());
+			formData.append("password", password);
+			formData.append("role", "user");
+
+			try {
+				let response = await fetch("/register", {
+					method: "POST",
+					body: formData
+				});
+
+				let result = await response.json();
+
+				if (result.success) {
+					document.cookie = `username=${document.getElementById("username").value.trim()}; path=/`;
+					document.cookie = `email=${email}; path=/`;
+					document.cookie = `mobile=${document.getElementById("mobile").value.trim()}; path=/`;
+					document.cookie = `type=user; path=/`;
+
+					var myModal = new bootstrap.Modal(document.getElementById('successModal'));
+					myModal.show();
+
+					setTimeout(() => {
+						window.location.href = "/userhome";
+					}, 1000);
+				} else {
+					alert("Registration failed! " + (result.error || "Unknown error."));
+				}
+			} catch (error) {
+				console.error("Error:", error);
+				alert("Something went wrong! Please check your network and try again.");
+			}
+		}
+
+		registrationForm.addEventListener("submit", registerUser);
+	});
+	</script>
+</head>
+<body>
+
+	<header>
+		<h2>🚀 Register Your Details</h2>
+	</header>
+
+	<div class="container">
+		<p class="text-center mb-4">Enter your correct details below to sign up.</p>
+		<form id="registrationForm" onsubmit="registerUser(event)">
+			<label for="email">E-Mail ID:</label>
+			<input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+
+			<label for="mobile">Mobile Number:</label>
+			<input type="text" class="form-control" id="mobile" placeholder="Enter your mobile number" required>
+
+			<label for="username">Username:</label>
+			<input type="text" class="form-control" id="username" placeholder="Enter your username" required>
+
+			<label for="password">Password:</label>
+			<input type="password" class="form-control" id="password" placeholder="Enter your password" required>
+
+			<button type="submit" class="btn mt-3">Submit</button>
+		</form>
+	</div>
+
+	<!-- Success Modal -->
+	<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content bg-dark text-light">
+				<div class="modal-header border-0">
+					<h5 class="modal-title text-success" id="successModalLabel">🎉 Registration Successful</h5>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					Your details have been submitted successfully! Redirecting to dashboard...
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<footer>
+		&copy; 2025 Registration Portal. All rights reserved.
+	</footer>
+
+</body>
+</html>

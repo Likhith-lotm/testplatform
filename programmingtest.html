@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Programming Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to right, #0f0c29, #302b63, #24243e);
+      color: #d5cccc00;
+      margin: 0;
+      padding-bottom: 60px;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+     
+    }
+
+    .navbar {
+  background-color: rgba(18, 18, 18, 0.5); /* semi-transparent black */
+  backdrop-filter: blur(10px);            /* frosted glass effect */
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+    
+
+    .navbar a {
+      color: #f4a940;
+      text-decoration: none;
+      margin: 0 10px;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .navbar a:hover {
+      color: #fff;
+    }
+
+    .container {
+  background-color: rgba(18, 18, 18, 0.5);  /* semi-transparent black */
+  color: #f5f5f5;
+  border-radius: 16px;
+  padding: 30px;
+  width: 90%;
+  max-width: 900px;
+  margin: 40px auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px); /* optional: frosted glass effect */
+}
+
+    
+
+    h2 {
+      color: #f4a940;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .question-block {
+      margin-bottom: 40px;
+      border-bottom: 1px solid #2a2a2a;
+      padding-bottom: 25px;
+    }
+
+    pre {
+      background-color: #1e1e1e;
+      color: #e0e0e0;
+      padding: 12px;
+      border-radius: 10px;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+
+    label {
+      color: #ccc;
+      margin-top: 10px;
+      display: block;
+    }
+
+    textarea {
+      background-color: #1e1e1e;
+      color: #fff;
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 10px;
+      width: 100%;
+      margin-top: 5px;
+    }
+
+    .btn {
+      background-color: #f4a940;
+      border: none;
+      color: #000;
+      font-weight: 600;
+      padding: 12px 20px;
+      border-radius: 10px;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #ffbb54;
+      color: #000;
+      transform: scale(1.02);
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #121212;
+      color: #aaa;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+      font-size: 14px;
+      border-top: 1px solid #2a2a2a;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        width: 95%;
+        padding: 20px;
+      }
+
+      .btn {
+        width: 100%;
+        margin-top: 10px;
+      }
+    }
+  </style>
+
+  <!-- 🔒 Anti-Cheat -->
+  <script>
+    document.addEventListener("contextmenu", e => e.preventDefault());
+
+    document.addEventListener("keydown", function (e) {
+      if ((e.ctrlKey && ['c', 'u', 'x','v'].includes(e.key.toLowerCase())) || e.key === 'F12') {
+        e.preventDefault();
+      }
+    });
+
+    let tabSwitchCount = 0;
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        tabSwitchCount++;
+        alert(`Tab switching is not allowed! Attempt ${tabSwitchCount}`);
+        if (tabSwitchCount >= 2) {
+          alert("You have been disqualified from the programming test.");
+          window.location.href = "/disqualified.html";
+        }
+      }
+    });
+  </script>
+</head>
+
+<body oncontextmenu="return false">
+
+
+  <div class="container">
+    <h2>Programming Prediction Test</h2>
+    <form id="programmingTestForm">
+      <div id="questionContainer"></div>
+      <button type="submit" class="btn mt-3">Submit Test</button>
+    </form>
+  </div>
+
+  <footer>&copy; 2025 Online Test System. All rights reserved.</footer>
+
+  <script>
+    function getCookie(name) {
+      const cookies = document.cookie.split(";");
+      for (let cookie of cookies) {
+        const [key, value] = cookie.trim().split("=");
+        if (key === name) return decodeURIComponent(value);
+      }
+      return null;
+    }
+
+    let userAnswers = {};
+
+    async function loadProgrammingQuestions() {
+      const res = await fetch("/api/get_programming_questions");
+      const data = await res.json();
+      if (!data.success) return alert("❌ Failed to load questions");
+
+      const container = document.getElementById("questionContainer");
+
+      data.questions.forEach((q, index) => {
+        const id = q._id.$oid || q._id;
+        const block = document.createElement("div");
+        block.className = "question-block";
+
+        block.innerHTML = `
+          <h5><strong>Q${index + 1}: ${q.question}</strong></h5>
+          <p><strong>Code:</strong></p>
+          <pre>${q.codeSnippet || "// No code snippet provided"}</pre>
+          <label for="answer_${id}">Your Predicted Output:</label>
+          <textarea id="answer_${id}" rows="3" placeholder="Type the expected output here..."></textarea>
+        `;
+
+        container.appendChild(block);
+      });
+    }
+
+    async function submitTest(event) {
+  event.preventDefault();
+
+  const answers = {};
+  document.querySelectorAll("textarea[id^='answer_']").forEach((textarea) => {
+    const id = textarea.id.replace("answer_", "");
+    const value = textarea.value.trim();
+    if (value) {
+      answers[`answer_${id}`] = value;
+    }
+  });
+
+  if (Object.keys(answers).length === 0) {
+    return alert("❌ Please answer at least one question before submitting.");
+  }
+
+  const payload = {
+    answers,
+    behavior: {
+      tabSwitchCount: typeof tabSwitchCount !== "undefined" ? tabSwitchCount : 0
+    }
+  };
+
+  try {
+    const res = await fetch("/submit_programming_test", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const result = await res.json();
+
+    if (!result.success) {
+      console.error("Backend response:", result);
+      return alert("❌ Submission failed.");
+    }
+
+    // Mark attempt locally (UI only)
+    localStorage.setItem("testType", "programming");
+
+    // Redirect
+    window.location.href = "/results";
+
+  } catch (err) {
+    console.error("❌ Network / server error:", err);
+    alert("❌ Submission failed due to server error.");
+  }
+}
+
+
+    document.getElementById("programmingTestForm").addEventListener("submit", submitTest);
+    window.onload = loadProgrammingQuestions;
+  </script>
+</body>
+</html>
