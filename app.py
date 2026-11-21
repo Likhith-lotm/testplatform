@@ -746,7 +746,7 @@ def make_app():
 
         # (r"/(.*)", StaticFileHandler, {"path": "templates"}),  # Serve from current directory
 
-    ], cookie_secret="YOUR_SECRET_KEY", debug=True)
+    ], cookie_secret="YOUR_SECRET_KEY", debug=True, template_path=os.path.dirname(__file__))
 
 if __name__ == "__main__":
     app = make_app()
