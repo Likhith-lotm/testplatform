@@ -253,7 +253,7 @@
       if (document.hidden) {
         tabSwitchCount++;
         alert(`Tab switching is not allowed! Attempt ${tabSwitchCount}`);
-        if (tabSwitchCount >= 2) {
+        if (tabSwitchCount >= 3) {
           alert("You have been disqualified for switching tabs.");
           window.location.href = "/disqualified.html"; // Create this page
         }

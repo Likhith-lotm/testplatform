@@ -14,10 +14,22 @@ import json
 from email.message import EmailMessage
 import os
 
+# Load environment variables from .env
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 # MongoDB Connection
-MONGO_URI = "mongodb+srv://likhth1234:nani0416@cluster04.uyhboig.mongodb.net/"
+MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://likhth1234:nani0416@cluster04.uyhboig.mongodb.net/")
+DB_NAME = os.environ.get("DB_NAME", "testdb")
+PORT = int(os.environ.get("PORT", 9999))
+COOKIE_SECRET = os.environ.get("COOKIE_SECRET", "YOUR_SECRET_KEY")
+DEBUG = os.environ.get("DEBUG", "True").lower() in ("1", "true", "yes")
+
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
-db = client["testdb"]
+db = client[DB_NAME]
 users_collection = db["users"]
 questions_collection = db["questions"]
 
@@ -497,7 +509,7 @@ import json
 
 
 
-db = client["testdb"]
+db = client[DB_NAME]
 users_collection = db["users"]
 
 
@@ -746,11 +758,11 @@ def make_app():
 
         # (r"/(.*)", StaticFileHandler, {"path": "templates"}),  # Serve from current directory
 
-    ], cookie_secret="YOUR_SECRET_KEY", debug=True, template_path=os.path.dirname(__file__))
+    ], cookie_secret=COOKIE_SECRET, debug=DEBUG, template_path=os.path.dirname(__file__))
 
 if __name__ == "__main__":
     app = make_app()
     fs = motor.motor_asyncio.AsyncIOMotorGridFSBucket(db)
-    app.listen(9999)
-    print("Server running on http://localhost:9999")
+    app.listen(PORT)
+    print(f"Server running on http://localhost:{PORT}")
     tornado.ioloop.IOLoop.current().start()
